@@ -70,7 +70,6 @@ class HBNBCommand(cmd.Cmd):
 
     def do_EOF(self, arg):
         """EOF(end_of_file) command to exit the program"""
-        print()
         return True
 
     def help_EOF(self):
