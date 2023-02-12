@@ -68,15 +68,6 @@ class HBNBCommand(cmd.Cmd):
         print("*** Unknown syntax: {}".format(arg))
         return False
 
-    def do_emptyline(self):
-        """Executes nothing when no command is passed to the interpreter"""
-        pass
-
-    def help_emptyline(self):
-        """Help output for the emptyline command"""
-        print("Executes nothing when no command is entered")
-        print()
-
     def do_EOF(self, arg):
         """EOF(end_of_file) command to exit the program"""
         print()
