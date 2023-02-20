@@ -42,11 +42,10 @@
   margin-top: 50px;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: space-around;
   height: 80px;
   border-top: 1px solid #DDDDDD;
   border-bottom: 1px solid #DDDDDD;
-  padding: 0px 20px;
 }
 .information .max_guest,
 .information .number_rooms,

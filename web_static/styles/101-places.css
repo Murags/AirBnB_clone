@@ -7,6 +7,10 @@
 }
 .places{
   text-align: center;
+  display: flex;
+  justify-content: center;
+  flex-flow: wrap;
+  width: 100%;
 }
 .places article{
   width: 390px;
@@ -69,7 +73,7 @@ footer{
 }
 .places .user{
   text-align: left;
-  padding: 15px 0 10px 0;
+  padding: 15px 0 10px 0; 
 }
 .places .user span{
   font-weight: bold;
@@ -78,4 +82,55 @@ footer{
   text-align: left;
   font-size: 12px;
   font-weight: 400;
+  margin-top: 0;
+}
+.places article .amenities,
+.places article .reviews{
+  margin-top: 40px;
+  width: 100%;
+  height: fit-content;
+}
+.places article .amenities h2,
+.places article .reviews h2{
+  text-align: left;
+  font-size: 16px;
+  border-bottom: 1px solid #DDDDDD;
+  padding-bottom: 5px;
+}
+.places article .amenities li{
+  list-style-type: none;
+  margin-top: 10px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  padding-left: 30px;
+}
+.places article .reviews li{
+  list-style-type: none;
+  text-align: left;
+  margin-top: 10px;
+}
+.places article .reviews h3{
+  font-size: 14px;
+}
+.places article .reviews p{
+  font-size: 12px;
+}
+.places article .amenities .tv{
+  background: url("../images/icon_tv.png") left center no-repeat;
+}
+
+.places article .amenities .wifi{
+  background: url("../images/icon_wifi.png") left center no-repeat;
+}
+
+.places article .amenities .pet{
+  background: url("../images/icon_pets.png") left center no-repeat;
+}
+.places article .amenities .tv,
+.places article .amenities .pet,
+.places article .amenities .wifi{
+  height: 20px;
+  width: auto;
+  background-size: contain;
 }
