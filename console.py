@@ -2,7 +2,8 @@
 """Entry point for the command interpreter """
 import cmd
 import re
-import models
+import ast
+import json
 from models.__init__ import storage
 from models.base_model import BaseModel
 from models.user import User
@@ -32,7 +33,6 @@ def type_parser(arg):
         arg = float(arg)
     return arg
 
-
 class HBNBCommand(cmd.Cmd):
     """Command interpreter class for AirBnB program"""
 
@@ -56,8 +56,14 @@ class HBNBCommand(cmd.Cmd):
         match = re.search(r"\.", arg)
         if match is not None:
             input_list = [arg[:match.span()[0]], arg[match.span()[1]:]]
-            input_list[1] = re.sub('["\',]+', '', input_list[1])
-            match = re.search(r"\((.*?)\)", input_list[1])
+            if re.search(r"[\{]", input_list[1]) is not None: # Searches for a dictionary in the input
+                input_list[1] = re.sub(',(?=.*\{)', '', input_list[1], 1) # Only substitutes the first comma in the input
+                input_list[1] = re.sub('["]+', '', input_list[1]) # Substitutes "
+
+                match = re.search(r"\((.*?)\)", input_list[1])
+            else:
+                input_list[1] = re.sub('[",]+', '', input_list[1])
+                match = re.search(r"\((.*?)\)", input_list[1])
 
             if match is not None:
                 cmd_list = [input_list[1][:match.span()[0]],
@@ -68,23 +74,18 @@ class HBNBCommand(cmd.Cmd):
         print("*** Unknown syntax: {}".format(arg))
         return False
 
-    def do_EOF(self, arg):
-        """EOF(end_of_file) command to exit the program"""
-        return True
+    def do_emptyline(self):
+        """Executes nothing when no command is passed to the interpreter"""
+        pass
 
-    def help_EOF(self):
-        """Help output for the EOF command"""
-        print("Exits the interpreter when Ctrl-D(EOF) is entered")
+    def do_EOF(self, arg):
+        """EOF(end_of_file) command to exit the interpreter"""
         print()
+        return True
 
     def do_quit(self, arg):
-        """Quit command to exit the program"""
+        """Quit command to exit the interpreter"""
         return True
-
-    def help_quit(self):
-        """Help output for the quit command"""
-        print("Quit command to exit the program")
-        print()
 
     def do_create(self, arg):
         """
@@ -111,6 +112,7 @@ class HBNBCommand(cmd.Cmd):
         Prints string representation of an instance based on class name and id
         """
         line = arg.split()
+
         if len(line) == 0:
             print("** class name missing **")
         else:
@@ -132,13 +134,13 @@ class HBNBCommand(cmd.Cmd):
     def help_show(self):
         """Help output for the show command"""
         print("Prints string representation of an instance\
- based on class name and id")
+        based on class name and id")
         print()
 
     def do_all(self, arg):
         """
         Prints all string representation of all instances
- based/not on the class name
+        based/not on the class name
         """
         line = arg.split()
         inst_list = []
@@ -158,7 +160,7 @@ class HBNBCommand(cmd.Cmd):
     def help_all(self):
         """Help output for the all command"""
         print("Prints all string representation of all instances\
- based/not on the class name")
+        based/not on the class name")
         print()
 
     def do_destroy(self, arg):
@@ -189,7 +191,7 @@ class HBNBCommand(cmd.Cmd):
     def help_destroy(self):
         """Help output for the destroy command"""
         print("Deletes an instance based on the class name and id\
- (save the change into the JSON file)")
+        (save the change into the JSON file)")
         print()
 
     def do_update(self, arg):
@@ -197,7 +199,33 @@ class HBNBCommand(cmd.Cmd):
         Updates an instance based on the class name and id by
         adding or updating attribute (save the change into the JSON file)
         """
-        line = arg.split()
+        match = re.search(r"{(.*)}", arg) # Finding the dictionary in the arguments
+        if match is not None:
+            line = arg[:match.span()[0]].split() # Splitting arg upto where the dictionary starts
+            line.append(match.group()) # Adding the dictionary to the list
+            
+            #print(line) # Shows that the dictionary is part of the list of arguments
+
+            #line[2] = ast.literal_eval(str(line[2]))
+            #line[2] = json.loads(str(line[2]))       Tried all this to change str to dict but was getting an error
+            #line[2] = eval(str(line[2]))
+            
+            ag = re.sub('[}{\',]', '', line[2])
+            ag = re.sub(':', ' ', ag) #These two lines disassemble the dictionary to just arguments separated by white space
+            #print(ag)
+
+            ag = ag.split()#forms a list using those arguments
+            #print(ag)
+
+            it = iter(ag)
+            ag = dict(zip(it, it))#These two lines make the list a dictionary
+            #print(ag)
+
+            line[2] = ag#reinitializing the dictionary
+            #print(type(line[2]))
+
+        else:
+            line = arg.split()
         if len(line) == 0:
             print("** class name missing **")
         else:
@@ -213,8 +241,15 @@ class HBNBCommand(cmd.Cmd):
                         check = True
                         if len(line) == 2:
                             print("** attribute name missing **")
-                        elif len(line) == 3:
-                            print("** value missing **")
+                        elif len(line) == 3: # An argument list with a dictionary has a length of 3
+                            dict_inst = line[2] # Converting string to dictionary
+                            if isinstance(dict_inst, dict): # Checking if it is a dictionary
+                                for input_key, input_val in dict_inst.items():
+                                    input_value = type_parser(input_val)
+                                    setattr(value, input_key, input_value)
+                                    storage.save()
+                            else:
+                                print("** value missing **")
                         else:
                             line[3] = type_parser(line[3])
                             setattr(value, line[2], line[3])
@@ -225,7 +260,7 @@ class HBNBCommand(cmd.Cmd):
     def help_update(self):
         """Help output for the update command"""
         print("Updates an instance based on the class name and id by\
- adding or updating attribute (save the change into the JSON file)")
+        adding or updating attribute (save the change into the JSON file)")
         print()
 
     def do_count(self, arg):
