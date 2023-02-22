@@ -204,25 +204,15 @@ class HBNBCommand(cmd.Cmd):
             line = arg[:match.span()[0]].split() # Splitting arg upto where the dictionary starts
             line.append(match.group()) # Adding the dictionary to the list
             
-            #print(line) # Shows that the dictionary is part of the list of arguments
-
-            #line[2] = ast.literal_eval(str(line[2]))
-            #line[2] = json.loads(str(line[2]))       Tried all this to change str to dict but was getting an error
-            #line[2] = eval(str(line[2]))
-            
             ag = re.sub('[}{\',]', '', line[2])
             ag = re.sub(':', ' ', ag) #These two lines disassemble the dictionary to just arguments separated by white space
-            #print(ag)
 
-            ag = ag.split()#forms a list using those arguments
-            #print(ag)
+            ag = ag.split() #forms a list using those arguments
 
             it = iter(ag)
-            ag = dict(zip(it, it))#These two lines make the list a dictionary
-            #print(ag)
+            ag = dict(zip(it, it)) #These two lines make the list a dictionary
 
-            line[2] = ag#reinitializing the dictionary
-            #print(type(line[2]))
+            line[2] = ag #reinitializing the dictionary
 
         else:
             line = arg.split()
